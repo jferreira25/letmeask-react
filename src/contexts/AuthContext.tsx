@@ -36,10 +36,12 @@ export function AuthContextProvider(props:AuthContextProviderProps){
           })
         }
       })
+      
       return ()=>{
         unsubscribe();
       }
     },[]);
+
     async function sigInWithGoogle(){
       const provider = new firebase.auth.GoogleAuthProvider();
       const result = await  auth.signInWithPopup(provider);
