@@ -9,9 +9,10 @@ import { FormEvent } from 'react'
 import { useState } from 'react'
 import { database } from '../services/firebase'
 
+
 export function Home(){
     const history = useHistory();
-    const { user, sigInWithGoogle} = useAuth();
+    const { user, sigInWithGoogle,signOutWithGoogle} = useAuth();
     const [ roomCode, setRoomCode] = useState('');
     
    async function handleCreateRoom(){
@@ -20,6 +21,12 @@ export function Home(){
         await sigInWithGoogle();
 
         history.push('/rooms/new');
+    }
+
+    async function handleLoggoff(){
+     
+      
+            await signOutWithGoogle();
     }
 
    async function handleJoinRoom(event:FormEvent){
@@ -51,12 +58,23 @@ export function Home(){
                 <p>tire as dúvidas de sua audiencia em tempo real</p>
             </aside>
             <main>
+                
                 <div className="main-content">
                     <img src={logoImg} alt="letmeAsk" />
-                    <button onClick={handleCreateRoom} className="create-room">
+                   {!user && (
+                        <button onClick={handleCreateRoom} className="create-room">
                         <img src={googleIconImg} alt="Logo do google" />
                         Crie sua sala com o Google
                     </button>
+                   )}
+                    {user && (
+                        <button onClick={handleLoggoff} className="create-room">
+                        <img src={googleIconImg} alt="Logo do google" />
+                        SignOut
+                        </button>
+                       
+                    )}
+                   
                     <div className="separator">ou entre em uma sala </div>
                     <form onSubmit={handleJoinRoom}>
                         <input
@@ -71,6 +89,8 @@ export function Home(){
                     </form>
                 </div>
             </main>
+           
         </div>
+        
     )
 }
