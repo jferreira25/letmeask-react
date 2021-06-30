@@ -8,25 +8,51 @@ import { useAuth } from '../hooks/useAuth'
 import { FormEvent } from 'react'
 import { useState } from 'react'
 import { database } from '../services/firebase'
+import GenericModalDialog from '../components/ModalDialog/Modal.Dialog'
+import { UseModalDialog } from '../hooks/useModalDialog'
+import { useEffect } from 'react'
+import useStyles from '../components/ModalDialog/style'
+import { getUser } from '../services/mockon'
 
 
 export function Home(){
     const history = useHistory();
     const { user, sigInWithGoogle,signOutWithGoogle} = useAuth();
     const [ roomCode, setRoomCode] = useState('');
+    const [colorButton,setColorButton] = useState('');
+    const {handleClickOpen,handleClose,open,modalValue} = UseModalDialog();
+    const classes = useStyles({ hasBlock: colorButton })();
     
    async function handleCreateRoom(){
-
+   
        if(!user)
         await sigInWithGoogle();
 
         history.push('/rooms/new');
     }
 
+    useEffect(()=>{
+        
+        if(modalValue)
+            ModalAllowed();
+            // return ()=>{
+            //     modalValue;
+            //   }
+    },[modalValue]);
+
+    
+
+    async  function ModalAllowed(){
+        await signOutWithGoogle();
+        }
+
     async function handleLoggoff(){
-     
-      
-            await signOutWithGoogle();
+       //funcoes de state sao asyncronas para isso usar useEffect
+        handleClickOpen();
+           // await signOutWithGoogle();
+    }
+    function sendAxios(){
+        getUser();
     }
 
    async function handleJoinRoom(event:FormEvent){
@@ -60,7 +86,26 @@ export function Home(){
             <main>
                 
                 <div className="main-content">
+                    <div>
+                    <Button type="submit" onClick={sendAxios}>
+                             Entrar na sala
+                         </Button>
+
+                        defina cor do seu botão
+                        <form>
+                            <input
+                            type="text"
+                            placeholder="Digite a cor do botão"
+                            onChange={event=>setColorButton(event.target.value)}
+                            value = {colorButton}
+                            />
+                        </form>
+                    </div>
                     <img src={logoImg} alt="letmeAsk" />
+                    <button onClick={handleCreateRoom} className={classes.switch}>
+                        <img src={googleIconImg} alt="Logo do google" />
+                        Crie sua sala com o Google
+                    </button>
                    {!user && (
                         <button onClick={handleCreateRoom} className="create-room">
                         <img src={googleIconImg} alt="Logo do google" />
@@ -89,6 +134,11 @@ export function Home(){
                     </form>
                 </div>
             </main>
+           <GenericModalDialog
+           open ={open}
+           handleClickOpen ={handleClickOpen}
+           handleClose ={handleClose}
+           />
            
         </div>
         
